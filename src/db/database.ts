@@ -7,7 +7,6 @@ export type Session = {
   check_in: number;
   check_out: number | null;
   date: string;
-  memo: string;
 };
 
 export function initDatabase() {
@@ -16,8 +15,7 @@ export function initDatabase() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       check_in INTEGER NOT NULL,
       check_out INTEGER,
-      date TEXT NOT NULL,
-      memo TEXT DEFAULT ''
+      date TEXT NOT NULL
     );
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY,
@@ -37,17 +35,12 @@ export function startSession(): number {
   return result.lastInsertRowId;
 }
 
-export function endSession(sessionId: number, memo = '') {
+export function endSession(sessionId: number) {
   db.runSync(
-    'UPDATE sessions SET check_out = ?, memo = ? WHERE id = ?',
+    'UPDATE sessions SET check_out = ? WHERE id = ?',
     Date.now(),
-    memo,
     sessionId
   );
-}
-
-export function updateMemo(sessionId: number, memo: string) {
-  db.runSync('UPDATE sessions SET memo = ? WHERE id = ?', memo, sessionId);
 }
 
 export function getActiveSession(): Session | null {

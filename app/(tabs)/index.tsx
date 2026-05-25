@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
-  TextInput,
   ScrollView,
   StyleSheet,
   RefreshControl,
@@ -14,7 +13,6 @@ import { colors, spacing, radius, font } from '../../src/theme';
 import {
   getTodaySessions,
   getActiveSession,
-  updateMemo,
   type Session,
 } from '../../src/db/database';
 import { isTrackingActive } from '../../src/services/locationService';
@@ -54,7 +52,6 @@ export default function HomeScreen() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [tracking, setTracking] = useState(false);
   const [now, setNow] = useState(Date.now());
-  const [memo, setMemo] = useState('');
 
   const refresh = useCallback(async () => {
     const a = getActiveSession();
@@ -63,7 +60,6 @@ export default function HomeScreen() {
     setActive(a);
     setSessions(s);
     setTracking(t);
-    if (a) setMemo(a.memo ?? '');
   }, []);
 
   useFocusEffect(
@@ -87,10 +83,6 @@ export default function HomeScreen() {
   const currentMs = active ? now - active.check_in : 0;
   const totalMs = completedMs + currentMs;
   const inLab = active !== null;
-
-  const handleMemoBlur = () => {
-    if (active) updateMemo(active.id, memo);
-  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -128,21 +120,6 @@ export default function HomeScreen() {
             </Text>
           )}
         </View>
-
-        {inLab && (
-          <View style={styles.card}>
-            <Text style={styles.label}>メモ</Text>
-            <TextInput
-              style={styles.memoInput}
-              value={memo}
-              onChangeText={setMemo}
-              onBlur={handleMemoBlur}
-              placeholder="今日の作業内容..."
-              placeholderTextColor={colors.inactive}
-              multiline
-            />
-          </View>
-        )}
 
         {sessions.filter((s) => s.check_out !== null).length > 0 && (
           <View style={styles.card}>
@@ -209,14 +186,6 @@ const styles = StyleSheet.create({
   },
   totalTime: { fontFamily: font.bold, fontSize: 40, color: colors.text, lineHeight: 48 },
   currentSession: { fontFamily: font.regular, fontSize: 13, color: colors.primary },
-  memoInput: {
-    fontFamily: font.regular,
-    fontSize: 15,
-    color: colors.text,
-    minHeight: 80,
-    textAlignVertical: 'top',
-    lineHeight: 22,
-  },
   sessionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
