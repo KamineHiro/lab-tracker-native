@@ -1,0 +1,26 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="らぼログ アプリアイコン">
+  <title>らぼログ icon</title>
+ 
+  <!-- 背景（App Store提出時は角丸なしのフルスクエア。OS側で角丸処理されます） -->
+  <rect width="1024" height="1024" fill="#3D82F0"/>
+ 
+  <!-- 位置ピン（上部中央、やや小さめ） -->
+  <path d="M512 180
+           C 392 180 296 276 296 396
+           C 296 556 512 700 512 700
+           C 512 700 728 556 728 396
+           C 728 276 632 180 512 180 Z"
+        fill="#FFFFFF"/>
+
+  <!-- ピン中央の丸 -->
+  <circle cx="512" cy="390" r="80" fill="#3D82F0"/>
+
+
+  <!-- 折れ線グラフ（下部、大きく・右上がり） -->
+  <polyline points="160,920 320,858 480,890 640,800 864,740"
+            fill="none" stroke="#FFFFFF" stroke-width="36"
+            stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- グラフ終点の丸 -->
+  <circle cx="864" cy="740" r="30" fill="#FFFFFF"/>
+</svg>

@@ -115,7 +115,7 @@ export default function HomeScreen() {
         refreshControl={<RefreshControl refreshing={false} onRefresh={refresh} />}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>LabTracker</Text>
+          <Text style={styles.title}>らぼログ</Text>
           <View style={styles.gpsRow}>
             <GpsStatusIcon active={tracking} />
             <Text style={[styles.gpsLabel, { color: tracking ? colors.success : colors.inactive }]}>
