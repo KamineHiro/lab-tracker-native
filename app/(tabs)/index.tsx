@@ -13,6 +13,7 @@ import { colors, spacing, radius, font } from '../../src/theme';
 import {
   getTodaySessions,
   getActiveSession,
+  getSessionsByDateRange,
   type Session,
 } from '../../src/db/database';
 import { isTrackingActive } from '../../src/services/locationService';
@@ -29,6 +30,19 @@ function formatDuration(ms: number): string {
 function formatTime(ms: number): string {
   const d = new Date(ms);
   return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+}
+
+function getWeekRange(): { start: string; end: string } {
+  const today = new Date();
+  const dow = today.getDay();
+  const mon = new Date(today);
+  mon.setDate(today.getDate() - ((dow + 6) % 7));
+  const sun = new Date(mon);
+  sun.setDate(mon.getDate() + 6);
+  return {
+    start: mon.toISOString().split('T')[0],
+    end: sun.toISOString().split('T')[0],
+  };
 }
 
 function GpsStatusIcon({ active }: { active: boolean }) {
@@ -52,6 +66,8 @@ export default function HomeScreen() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [tracking, setTracking] = useState(false);
   const [now, setNow] = useState(Date.now());
+  const [weekTotalMs, setWeekTotalMs] = useState(0);
+  const [weekDays, setWeekDays] = useState(0);
 
   const refresh = useCallback(async () => {
     const a = getActiveSession();
@@ -60,6 +76,13 @@ export default function HomeScreen() {
     setActive(a);
     setSessions(s);
     setTracking(t);
+
+    const { start, end } = getWeekRange();
+    const weekSessions = getSessionsByDateRange(start, end);
+    const totalMs = weekSessions.reduce((sum, ws) => sum + (ws.check_out! - ws.check_in), 0);
+    const days = new Set(weekSessions.map((ws) => ws.date)).size;
+    setWeekTotalMs(totalMs);
+    setWeekDays(days);
   }, []);
 
   useFocusEffect(
@@ -119,6 +142,25 @@ export default function HomeScreen() {
               現在のセッション: {formatDuration(currentMs)}
             </Text>
           )}
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.label}>今週</Text>
+          <View style={styles.weekRow}>
+            <View style={styles.weekItem}>
+              <Text style={styles.weekValue}>{weekDays}</Text>
+              <Text style={styles.weekUnit}>回 訪問</Text>
+            </View>
+            <View style={styles.weekDivider} />
+            <View style={styles.weekItem}>
+              <Text style={styles.weekValue}>
+                {Math.floor(weekTotalMs / 3600000)}
+                <Text style={styles.weekUnit}>h </Text>
+                {Math.floor((weekTotalMs % 3600000) / 60000)}
+                <Text style={styles.weekUnit}>m</Text>
+              </Text>
+            </View>
+          </View>
         </View>
 
         {sessions.filter((s) => s.check_out !== null).length > 0 && (
@@ -186,6 +228,11 @@ const styles = StyleSheet.create({
   },
   totalTime: { fontFamily: font.bold, fontSize: 40, color: colors.text, lineHeight: 48 },
   currentSession: { fontFamily: font.regular, fontSize: 13, color: colors.primary },
+  weekRow: { flexDirection: 'row', alignItems: 'center' },
+  weekItem: { flex: 1, alignItems: 'center', paddingVertical: spacing.sm },
+  weekDivider: { width: 1, height: 36, backgroundColor: colors.border },
+  weekValue: { fontFamily: font.bold, fontSize: 28, color: colors.text },
+  weekUnit: { fontFamily: font.regular, fontSize: 13, color: colors.textSecondary },
   sessionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

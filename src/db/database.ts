@@ -22,6 +22,25 @@ export function initDatabase() {
       value TEXT NOT NULL
     );
   `);
+  cleanupStaleSessions();
+}
+
+// check_out が NULL のまま日付をまたいだセッションをその日の23:59:59に自動クローズする
+function cleanupStaleSessions() {
+  const today = new Date().toISOString().split('T')[0];
+  const staleSessions = db.getAllSync<Session>(
+    'SELECT * FROM sessions WHERE check_out IS NULL AND date < ?',
+    today
+  );
+  for (const s of staleSessions) {
+    const endOfDay = new Date(s.date);
+    endOfDay.setHours(23, 59, 59, 999);
+    db.runSync(
+      'UPDATE sessions SET check_out = ? WHERE id = ?',
+      endOfDay.getTime(),
+      s.id
+    );
+  }
 }
 
 export function startSession(): number {
