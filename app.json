@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "LabTracker",
+    "slug": "lab-tracker-native",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "lab-tracker",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#F7F8FC"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.labtracker.app",
+      "infoPlist": {
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "研究室の滞在時間を自動的に記録するためにGPSを使用します。",
+        "NSLocationWhenInUseUsageDescription": "研究室の滞在時間を記録するためにGPSを使用します。",
+        "UIBackgroundModes": ["location", "fetch"]
+      }
+    },
+    "android": {
+      "package": "com.labtracker.app",
+      "permissions": [
+        "ACCESS_BACKGROUND_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "研究室の滞在時間を自動的に記録するためにGPSを使用します。"
+        }
+      ]
+    ]
+  }
+}
